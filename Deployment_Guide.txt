@@ -1,0 +1,36 @@
+# END-TO-END DEPLOYMENT GUIDE: STREAMLIT TO DECOUPLED WEB APP
+
+## 1. Local Directory Structure
+Create a folder on your computer named `open-renewal-intelligence`. Inside it, match this structure exactly:
+open-renewal-intelligence/
+├── images/
+│   ├── Main_Logo.png
+│   └── General_Logo.png
+├── main.py
+├── requirements.txt
+├── index.html
+├── style.css
+└── script.js
+
+## 2. Pushing to GitHub
+1. Sign into GitHub.com and create a new public repository named `open-renewal-intelligence`.
+2. Do NOT check "Add a README file".
+3. Use GitHub Desktop to drag your local `open-renewal-intelligence` folder into the app, commit the files, and click "Publish Repository".
+
+## 3. Deploying the Backend to Render
+1. Log into Render.com and select New + -> Web Service.
+2. Connect your GitHub account and choose the `open-renewal-intelligence` repository.
+3. Configure the settings exactly as follows:
+   - Language: Python 3
+   - Build Command: pip install -r requirements.txt
+   - Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+   - Instance Type: Free
+4. Click Deploy Web Service. Once live, copy your Web Service URL (e.g., https://open-renewal-intelligence.onrender.com).
+
+## 4. Connecting the Frontend to Render & Launching GitHub Pages
+1. Open your local `script.js` file and replace the `BACKEND_SERVICE_URL` string on Line 2 with your live Render URL.
+2. Save the file and sync/push the change to GitHub using GitHub Desktop.
+3. On your repository page on GitHub.com, click Settings -> Pages (left sidebar).
+4. Under "Build and deployment", set Source to "Deploy from a branch".
+5. Set the Branch dropdown to "main", leave the folder as "/ (root)", and click Save.
+6. In ~60 seconds, GitHub will provide your live public website link.
