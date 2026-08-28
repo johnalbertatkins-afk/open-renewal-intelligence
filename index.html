@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Atkins Consulting | Renewal Intelligence Dashboard</title>
-    <!-- Load Plotly Visual Engine Core -->
+    <!-- Load Interactive Plotly Client Graphics Library Engine -->
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
     
     <style>
+        /* =============================================================================
+           Atkins Consulting - Renewal Intelligence Token Sheets
+           Custom Brand Identity & Decoupled Application Layout Matrix
+           ============================================================================= */
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono&display=swap');
 
         :root {
-            --ink: #0E2233;
-            --surface: #F4F6F8;
-            --card: #FFFFFF;
-            --accent: #0E7C86;
-            --line: #DDE4EA;
-            --mute: #5A6B78;
-            --green: #1E8E5A;
-            --amber: #C77D0A;
-            --red: #C0392B;
+            --ink: #0E2233;        /* Deep slate navy - primary typography */
+            --surface: #F4F6F8;    /* Cool off-white background wash */
+            --card: #FFFFFF;       /* Pure solid layout elements */
+            --accent: #0E7C86;     /* Restrained teal - brand anchor element */
+            --line: #DDE4EA;       /* Boundary grids */
+            --mute: #5A6B78;       /* Secondary structural captions */
+            --green: #1E8E5A;      /* Safe zone marker */
+            --amber: #C77D0A;      /* Elevated attention marker */
+            --red: #C0392B;        /* Critical operational risk marker */
         }
 
         body {
@@ -29,16 +33,23 @@
             padding-bottom: 90px;
         }
 
-        .ac-brandbar { display: flex; align-items: center; gap: 14px; }
-        .ac-mark {
-            width: 40px; height: 40px; border-radius: 10px; background: var(--ink);
-            color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
+        /* Brand Plate Panel */
+        .ac-brand-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
         }
-        .ac-word { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); }
-        .ac-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--mute); text-transform: uppercase; margin-top: 3px; }
+        
+        .ac-brand-logo {
+            max-height: 85px;
+            width: auto;
+            display: block;
+        }
+
         .ac-rule { height: 3px; width: 100%; background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 55%, transparent 100%); margin: 8px 0 20px 0; }
 
+        /* Navigation Bar Component */
         .ac-nav-container { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
         .nav-btn {
             background: var(--card); border: 1px solid var(--line); border-radius: 8px;
@@ -46,15 +57,42 @@
         }
         .nav-btn.active, .nav-btn:hover { background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
 
+        /* Structural Page Wrappers */
         .ac-hero { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(14,34,51,0.04); }
         .ac-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin: 0 0 12px 0; line-height: 1.2; }
         .ac-hero p { font-size: 1.02rem; color: var(--mute); line-height: 1.6; margin: 0; }
 
+        /* Summary Scoreboard Cards */
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
         .metric-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .metric-card h3 { margin: 0; font-size: 0.85rem; color: var(--mute); text-transform: uppercase; letter-spacing: 0.05em; }
         .metric-card h2 { margin: 10px 0 0 0; font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; }
 
+        /* Strategy Walkthrough Walk Blocks */
+        .how-it-works-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .step-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .step-num {
+            color: var(--accent);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .step-card h4 { margin: 0 0 10px 0; font-size: 1.1rem; font-family: 'Space Grotesk', sans-serif; }
+        .step-card p { margin: 0; color: var(--mute); font-size: 0.9rem; line-height: 1.5; }
+
+        /* Dynamic Worklist Portfolio Grids */
         .portfolio-workspace { display: flex; gap: 20px; margin-bottom: 20px; }
         .chart-container-left { flex: 2; background: var(--card); border-radius: 12px; border: 1px solid var(--line); padding: 16px; }
         .drilldown-hub-right { flex: 1; background: var(--card); border-radius: 12px; border: 1px solid var(--line); padding: 20px; }
@@ -71,8 +109,13 @@
         .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); margin-bottom: -2px; }
 
         .ac-note { background: #EEF4F5; border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+        
+        /* Floating Dashboard Controller Footers */
         .global-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 24px; align-items: center; box-sizing: border-box; z-index: 1000; box-shadow: 0 -4px 12px rgba(14,34,51,0.06); }
-        .update-btn { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .global-controls label { font-weight: 500; font-size: 0.88rem; color: var(--ink); }
+        .global-controls input { padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.88rem; font-family: inherit; }
+        
+        .update-btn { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.15s ease; }
         .update-btn:hover { background: var(--ink); }
         select { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background-color: var(--card); font-family: inherit; font-size: 0.9rem; color: var(--ink); margin-bottom: 15px; }
         .hidden { display: none !important; }
@@ -80,15 +123,13 @@
 </head>
 <body>
 
-    <div class="ac-brandbar">
-        <div class="ac-mark">AC</div>
-        <div>
-            <div class="ac-word">Atkins Consulting</div>
-            <div class="ac-tag">Adoption and Value Realization Framework Matrix</div>
-        </div>
+    <!-- Unified Brand Image Header Panel (Now safely mapping to Capitalized /Images/ directory) -->
+    <div class="ac-brand-container">
+        <img src="./Images/Main_Logo.png" alt="Atkins Consulting Corporate Logo Banner" class="ac-brand-logo">
     </div>
     <div class="ac-rule"></div>
 
+    <!-- Multi-page Router Buttons -->
     <div class="ac-nav-container">
         <button id="nav-Home" class="nav-btn active" onclick="routeToPage('Home')">Home</button>
         <button id="nav-Howitworks" class="nav-btn" onclick="routeToPage('Howitworks')">How it works</button>
@@ -98,20 +139,48 @@
         <button id="nav-Assumptions" class="nav-btn" onclick="routeToPage('Assumptions')">Assumptions</button>
     </div>
 
-    <!-- HOME TAB -->
+    <!-- HOME TAB LAYOUT CANVAS -->
     <div id="page-Home" class="app-page">
         <div class="ac-hero">
-            <h1>See which customers are drifting off the path throughout the customer journey.</h1>
-            <p>This agent learns from your account history what a winning account looks like over time to place live accounts onto owner-assigned tactical frameworks.</p>
+            <h1>See which customers are drifting off the adoption and value realization path throughout the customer journey.</h1>
+            <p>This agent learns from your account history what a winning account looks like over time. It tracks the Signals behind that path, your product usage and account activity, and how they trend. It then places every live account on that path in real time and turns the gap into a ranked, owner-assigned action plan for forward deployed engineering and customer success teams.</p>
         </div>
+        
         <div class="metrics-grid">
             <div class="metric-card"><h3>Live Accounts Scored</h3><h2 id="m-scored">100</h2></div>
             <div class="metric-card"><h3>Flagged At Risk</h3><h2 id="m-risk" style="color:#C0392B">0</h2></div>
             <div class="metric-card"><h3>At Risk & Renewing Soon</h3><h2 id="m-soon" style="color:#C77D0A">0</h2></div>
         </div>
+
+        <!-- Sourced Strategy Grid Walkthrough Blocks (01, 02, 03, 04) -->
+        <div style="margin-top: 40px;">
+            <h3 style="color: var(--accent); font-size: 0.82rem; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.05em; margin-bottom: 15px;">HOW IT WORKS</h3>
+            <div class="how-it-works-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <h4>Learn the winning shape</h4>
+                    <p>From history, plot how usage evolved for accounts that renewed or expanded versus those that fell short. That is the benchmark band.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <h4>Find the early signals</h4>
+                    <p>Measure which usage signals actually separated winners from losers, and at which quarter. Earlier and sharper is more useful.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <h4>Place every live account</h4>
+                    <p>Score each current account against the winning band at its own quarter, and rank the book by risk, size, and time to renewal.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">04</div>
+                    <h4>Hand over an action plan</h4>
+                    <p>For each off-track account, produce a plan: the areas behind target, who owns each, and the number to move before renewal.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- HOW IT WORKS TAB -->
+    <!-- HOW IT WORKS TAB LAYOUT CANVAS -->
     <div id="page-Howitworks" class="app-page hidden">
         <div class="ac-hero">
             <h2>How the Agent Learns the Path</h2>
@@ -119,6 +188,7 @@
                 <button id="btn-tab-path" class="tab-btn active" onclick="switchSubTab('path')">Winning vs Losing Path</button>
                 <button id="btn-tab-matrix" class="tab-btn" onclick="switchSubTab('matrix')">Predictive Power Matrix (AUC)</button>
             </div>
+            
             <div id="subtab-path" class="subtab-content">
                 <div style="display:flex; gap:15px; margin:20px 0;">
                     <select id="sel-horizon" onchange="renderLineChart()"><option value="4">12-Month Horizon</option><option value="8">24-Month Horizon</option><option value="12">36-Month Horizon</option></select>
@@ -126,6 +196,7 @@
                 </div>
                 <div id="plotly-line-chart"></div>
             </div>
+            
             <div id="subtab-matrix" class="subtab-content hidden">
                 <table class="data-table">
                     <thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead>
@@ -135,7 +206,7 @@
         </div>
     </div>
 
-    <!-- PORTFOLIO TAB -->
+    <!-- PORTFOLIO TAB LAYOUT CANVAS -->
     <div id="page-Portfolio" class="app-page hidden">
         <h2>Account Portfolio</h2>
         <div class="portfolio-workspace">
@@ -156,7 +227,7 @@
         </table>
     </div>
 
-    <!-- ACCOUNT PLAN TAB -->
+    <!-- ACCOUNT PLAN TAB LAYOUT CANVAS -->
     <div id="page-AccountPlan" class="app-page hidden">
         <h2>Account Action Plan</h2>
         <select id="account-picker" onchange="loadAccountPlanView(this.value)"></select>
@@ -169,13 +240,13 @@
         </table>
     </div>
 
-    <!-- SIGNALS TAB -->
+    <!-- TRAJECTORY SIGNALS TAB LAYOUT CANVAS -->
     <div id="page-TrajectorySignals" class="app-page hidden">
         <h2>CS/FDE Trajectory Signal Library Definitions</h2>
         <div id="library-listing" class="ac-hero"></div>
     </div>
 
-    <!-- ASSUMPTIONS TAB -->
+    <!-- ASSUMPTIONS TAB LAYOUT CANVAS -->
     <div id="page-Assumptions" class="app-page hidden">
         <h2>Assumptions and Operating Metrics</h2>
         <div class="ac-note">
@@ -186,12 +257,14 @@
         </div>
     </div>
 
+    <!-- Global Parameter Controls Footer Panel Bar -->
     <div class="global-controls">
-        <label>Live Accounts to Score: <input type="number" id="ctrl-live" value="100"></label>
-        <label>Winner Mix Rate %: <input type="number" id="ctrl-winner" value="70"></label>
+        <label>Live Accounts to Score: <input type="number" id="ctrl-live" value="100" min="10" max="200"></label>
+        <label>Winner Mix Rate %: <input type="number" id="ctrl-winner" value="70" min="40" max="95"></label>
         <button onclick="recomputeEnginePipeline()" class="update-btn">Recompute Engine Pipeline</button>
     </div>
 
+    <!-- Script Application Connections Routing Network Manager Logic Engine -->
     <script>
         const BACKEND_SERVICE_URL = "https://open-renewal-agent.onrender.com"; 
         let engineCache = null;
@@ -258,7 +331,7 @@
             const signalSelect = document.getElementById('sel-signal'); signalSelect.innerHTML = "";
             engineCache.portfolio.forEach(a => { picker.innerHTML += `<option value="${a.account_id}">${a.account_id} (${a.segment})</option>`; });
             Object.keys(SIGNAL_METADATA).forEach(k => { signalSelect.innerHTML += `<option value="${k}">${SIGNAL_METADATA[k]}</option>`; });
-            if(engineCache.portfolio.length > 0) { loadAccountPlanView(engineCache.portfolio[0].account_id); }
+            if(engineCache.portfolio.length > 0) { loadAccountPlanView(engineCache.portfolio.account_id); }
         }
 
         function renderHomeInterface() {
@@ -297,12 +370,12 @@
             };
             Plotly.newPlot('plotly-quadrant-chart', [trace], {
                 title: 'Risk vs Time Matrix (Click marker to open)',
-                xaxis: { title: 'Quarters to Renewal' },
-                yaxis: { tickvals: [0.5, 1.5, 2.5], ticktext: ['At Risk', 'Needs Attention', 'On Track'], range: [0, 3] },
+                xaxis: { title: 'Quarters to Renewal (Sooner ←)' },
+                yaxis: { tickvals: [0.5, 1.5, 2.5], ticktext: ['At Risk', 'Needs Attention', 'On Track'], range: },
                 hovermode: 'closest'
             });
             document.getElementById('plotly-quadrant-chart').on('plotly_click', function(data){
-                navigateToAccountPlaybook(dataSet[data.points[0].pointIndex].account_id);
+                navigateToAccountPlaybook(dataSet[data.points.pointIndex].account_id);
             });
         }
 
@@ -312,14 +385,14 @@
             let xVals = [], yVals = [];
             for(let i=1; i<=parseInt(horizon); i++) {
                 xVals.push(`Q${i}`);
-                if (engineCache && engineCache.benchmarks && engineCache.benchmarks[horizon] && engineCache.benchmarks[horizon][i]) {
-                    yVals.push(engineCache.benchmarks[horizon][i][signal][1]); 
+                if(engineCache && engineCache.benchmarks && engineCache.benchmarks[horizon] && engineCache.benchmarks[horizon][i]) {
+                    yVals.push(engineCache.benchmarks[horizon][i][signal]); 
                 } else {
                     yVals.push(0);
                 }
             }
             const benchmarkTrace = { x: xVals, y: yVals, type: 'scatter', mode: 'lines+markers', name: 'Winning Benchmark', line: { color: '#1E8E5A', width: 3 } };
-            Plotly.newPlot('plotly-line-chart', [benchmarkTrace], { title: `${SIGNAL_METADATA[signal] || signal} Median Path Trajectory`, xaxis: { title: 'Timeline Interval Quarter' }, yaxis: { title: 'Calculated Scalar Value' } });
+            Plotly.newPlot('plotly-line-chart', [benchmarkTrace], { title: `${SIGNAL_METADATA[signal] || 'Signal'} Median Path Trajectory`, xaxis: { title: 'Timeline Interval Quarter' }, yaxis: { title: 'Calculated Scalar Value' } });
         }
 
         function renderAUCMatrixTable() {
@@ -338,11 +411,10 @@
 
         function loadAccountPlanView(id) {
             const acct = engineCache.portfolio.find(a => a.account_id === id);
-            if (!acct) return;
             const container = document.getElementById('account-meta-plate');
             container.innerHTML = `<div class="ac-note"><h3>Dossier Profile: ${acct.account_id}</h3><p>Segment Class: ${acct.segment} | Progressed to Quarter ${acct.current_quarter} of operational cycle.</p></div>`;
             const body = document.getElementById('plan-table-body'); body.innerHTML = "";
-            if(!acct.drivers || acct.drivers.length === 0) {
+            if(acct.drivers.length === 0) {
                 body.innerHTML = `<tr><td colspan="5" style="color:#1E8E5A; text-align:center; font-weight:bold;">✔ Account is tracking cleanly within optimal target tolerances.</td></tr>`;
                 return;
             }
