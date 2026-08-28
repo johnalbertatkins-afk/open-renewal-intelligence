@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <title>Atkins Consulting | Renewal Intelligence Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Load Plotly Graphics Core Engine -->
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
 </head>
 <body>
+
+    <!-- Unified Brand Plate Panel -->
     <div class="ac-brandbar">
         <div class="ac-mark">AC</div>
         <div>
@@ -16,48 +19,57 @@
     </div>
     <div class="ac-rule"></div>
 
+    <!-- Multi-page Router Buttons -->
     <div class="ac-nav-container">
-        <button class="nav-btn active" onclick="routeToPage('Home')">Home</button>
-        <button class="nav-btn" onclick="routeToPage('Howitworks')">How it works</button>
-        <button class="nav-btn" onclick="routeToPage('Portfolio')">Portfolio</button>
-        <button class="nav-btn" onclick="routeToPage('AccountPlan')">Account Plan</button>
-        <button class="nav-btn" onclick="routeToPage('TrajectorySignals')">Trajectory Signals</button>
-        <button class="nav-btn" onclick="routeToPage('Assumptions')">Assumptions</button>
+        <button id="nav-Home" class="nav-btn active" onclick="routeToPage('Home')">Home</button>
+        <button id="nav-Howitworks" class="nav-btn" onclick="routeToPage('Howitworks')">How it works</button>
+        <button id="nav-Portfolio" class="nav-btn" onclick="routeToPage('Portfolio')">Portfolio</button>
+        <button id="nav-AccountPlan" class="nav-btn" onclick="routeToPage('AccountPlan')">Account Plan</button>
+        <button id="nav-TrajectorySignals" class="nav-btn" onclick="routeToPage('TrajectorySignals')">Trajectory Signals</button>
+        <button id="nav-Assumptions" class="nav-btn" onclick="routeToPage('Assumptions')">Assumptions</button>
     </div>
 
+    <!-- Page Content Segments -->
+    <!-- HOME PAGE -->
     <div id="page-Home" class="app-page">
         <div class="ac-hero">
             <h1>See which customers are drifting off the adoption and value realization path throughout the customer journey.</h1>
-            <p>This agent learns from your account history what a winning account looks like over time...</p>
+            <p>This agent learns from your account history what a winning account looks like over time. It tracks product usage and account activity trends to place live accounts onto owner-assigned tactical frameworks.</p>
         </div>
         <div class="metrics-grid">
-            <div class="metric-card"><h3>Live Accounts Scored</h3><h2 id="m-scored">0</h2></div>
+            <div class="metric-card"><h3>Live Accounts Scored</h3><h2 id="m-scored">100</h2></div>
             <div class="metric-card"><h3>Flagged At Risk</h3><h2 id="m-risk" style="color:#C0392B">0</h2></div>
             <div class="metric-card"><h3>At Risk & Renewing Soon</h3><h2 id="m-soon" style="color:#C77D0A">0</h2></div>
         </div>
     </div>
 
+    <!-- HOW IT WORKS PAGE -->
     <div id="page-Howitworks" class="app-page hidden">
-        <h2>How the Agent Learns the Path</h2>
-        <div class="tab-header">
-            <button id="btn-tab-path" class="tab-btn active" onclick="switchSubTab('path')">Winning vs Losing Path</button>
-            <button id="btn-tab-matrix" class="tab-btn" onclick="switchSubTab('matrix')">Predictive Power Matrix (AUC)</button>
-        </div>
-        <div id="subtab-path" class="subtab-content">
-            <div style="display:flex; gap:15px; margin:20px 0;">
-                <select id="sel-horizon" onchange="renderLineChart()"><option value="4">12-Month Horizon</option><option value="8">24-Month Horizon</option><option value="12">36-Month Horizon</option></select>
-                <select id="sel-signal" onchange="renderLineChart()"></select>
+        <div class="ac-hero">
+            <h2>How the Agent Learns the Path</h2>
+            <div class="tab-header">
+                <button id="btn-tab-path" class="tab-btn active" onclick="switchSubTab('path')">Winning vs Losing Path</button>
+                <button id="btn-tab-matrix" class="tab-btn" onclick="switchSubTab('matrix')">Predictive Power Matrix (AUC)</button>
             </div>
-            <div id="plotly-line-chart"></div>
-        </div>
-        <div id="subtab-matrix" class="subtab-content hidden">
-            <table class="data-table">
-                <thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead>
-                <tbody id="auc-rows-body"></tbody>
-            </table>
+            
+            <div id="subtab-path" class="subtab-content">
+                <div style="display:flex; gap:15px; margin:20px 0;">
+                    <select id="sel-horizon" onchange="renderLineChart()"><option value="4">12-Month Horizon</option><option value="8">24-Month Horizon</option><option value="12">36-Month Horizon</option></select>
+                    <select id="sel-signal" onchange="renderLineChart()"></select>
+                </div>
+                <div id="plotly-line-chart"></div>
+            </div>
+            
+            <div id="subtab-matrix" class="subtab-content hidden">
+                <table class="data-table">
+                    <thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead>
+                    <tbody id="auc-rows-body"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- PORTFOLIO PAGE -->
     <div id="page-Portfolio" class="app-page hidden">
         <h2>Account Portfolio</h2>
         <div class="portfolio-workspace">
@@ -78,6 +90,7 @@
         </table>
     </div>
 
+    <!-- ACCOUNT PLAN PAGE -->
     <div id="page-AccountPlan" class="app-page hidden">
         <h2>Account Action Plan</h2>
         <select id="account-picker" onchange="loadAccountPlanView(this.value)"></select>
@@ -90,19 +103,24 @@
         </table>
     </div>
 
+    <!-- TRAJECTORY SIGNALS PAGE -->
     <div id="page-TrajectorySignals" class="app-page hidden">
         <h2>CS/FDE Trajectory Signal Library Definitions</h2>
         <div id="library-listing" class="ac-hero"></div>
     </div>
 
+    <!-- ASSUMPTIONS PAGE -->
     <div id="page-Assumptions" class="app-page hidden">
         <h2>Assumptions and Operating Metrics</h2>
         <div class="ac-note">
             <h3>Operating Tier Bounds</h3>
             <p><b>At risk (red):</b> Top ~8% by total gap distribution.</p>
+            <p><b>Needs attention (amber):</b> Next consecutive ~12% segment block.</p>
+            <p><b>On track (green):</b> Balance parameters inside compliance.</p>
         </div>
     </div>
 
+    <!-- Floating Dashboard Global Control Panel -->
     <div class="global-controls">
         <label>Live Accounts to Score: <input type="number" id="ctrl-live" value="100" min="10" max="200"></label>
         <label>Winner Mix Rate %: <input type="number" id="ctrl-winner" value="70" min="40" max="95"></label>

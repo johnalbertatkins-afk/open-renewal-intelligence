@@ -1,4 +1,5 @@
-const BACKEND_SERVICE_URL = "https://open-renewal-agent.onrender.com";
+// Change this string to your production URL once Render goes Live!
+const BACKEND_SERVICE_URL = "https://open-renewal-agent.onrender.com"; 
 let engineCache = null;
 let currentActiveFilter = null;
 
@@ -30,7 +31,7 @@ async function recomputeEnginePipeline() {
     };
 
     try {
-        const response = await fetch(`${https://open-renewal-intelligence.onrender.com}/api/engine-pipeline`, {
+        const response = await fetch(`${BACKEND_SERVICE_URL}/api/engine-pipeline`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -51,8 +52,9 @@ async function recomputeEnginePipeline() {
 function routeToPage(targetId) {
     document.querySelectorAll('.app-page').forEach(p => p.classList.add('hidden'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    
     document.getElementById(`page-${targetId}`).classList.remove('hidden');
-    if (event && event.target) event.target.classList.add('active');
+    document.getElementById(`nav-${targetId}`).classList.add('active');
 }
 
 function switchSubTab(tabMode) {
@@ -64,7 +66,6 @@ function switchSubTab(tabMode) {
 
 function initializeDropdowns() {
     const picker = document.getElementById('account-picker');
-    if (!picker) return;
     picker.innerHTML = "";
     const signalSelect = document.getElementById('sel-signal');
     signalSelect.innerHTML = "";
@@ -140,12 +141,15 @@ function renderLineChart() {
     const horizon = document.getElementById('sel-horizon').value;
     const signal = document.getElementById('sel-signal').value;
     const qCount = parseInt(horizon);
-    if (!signal) return;
     
     let xVals = [], yVals = [];
     for(let i=1; i<=qCount; i++) {
         xVals.push(`Q${i}`);
-        yVals.push(engineCache.benchmarks[horizon][i][signal][1]);
+        if (engineCache && engineCache.benchmarks && engineCache.benchmarks[horizon] && engineCache.benchmarks[horizon][i]) {
+            yVals.push(engineCache.benchmarks[horizon][i][signal][1]); 
+        } else {
+            yVals.push(0);
+        }
     }
 
     const benchmarkTrace = { x: xVals, y: yVals, type: 'scatter', mode: 'lines+markers', name: 'Winning Benchmark', line: { color: '#1E8E5A', width: 3 } };
@@ -162,7 +166,7 @@ function renderAUCMatrixTable() {
     for(let i=1; i<=parseInt(horizon); i++) { head.innerHTML += `<th>Quarter ${i}</th>`; }
 
     Object.keys(SIGNAL_METADATA).forEach(sig => {
-        if(engineCache.auc_matrix[horizon]["1"][sig] !== undefined) {
+        if(engineCache && engineCache.auc_matrix && engineCache.auc_matrix[horizon] && engineCache.auc_matrix[horizon]["1"] && engineCache.auc_matrix[horizon]["1"][sig] !== undefined) {
             let row = `<tr><td><b>${SIGNAL_METADATA[sig]}</b></td>`;
             for(let i=1; i<=parseInt(horizon); i++) {
                 row += `<td>${engineCache.auc_matrix[horizon][i][sig]}</td>`;
