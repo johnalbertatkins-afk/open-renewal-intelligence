@@ -5,13 +5,14 @@
     <title>Atkins Consulting | Renewal Intelligence Dashboard</title>
     <!-- Load Interactive Plotly Client Framework Engine Core -->
     <script src="https://plot.ly"></script>
+    
     <style>
         @import url('https://googleapis.com');
         :root {
             --ink: #0E2233; --surface: #F4F6F8; --card: #FFFFFF; --accent: #0E7C86;
             --line: #DDE4EA; --mute: #5A6B78; --green: #1E8E5A; --amber: #C77D0A; --red: #C0392B;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--surface); color: var(--ink); margin: 0; padding: 24px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--surface); color: var(--ink); margin: 0; padding: 24px; padding-bottom: 90px; }
         .ac-brand-container { display: flex; align-items: center; margin-bottom: 20px; background: rgba(255,255,255,0.65); padding: 8px 16px; border-radius: 12px; width: fit-content; }
         .ac-brand-logo { max-height: 80px; width: auto; display: block; }
         .ac-rule { height: 3px; width: 100%; background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 55%, transparent 100%); margin: 8px 0 20px 0; }
@@ -54,52 +55,41 @@
     </style>
 </head>
 <body>
-    <div class="ac-brand-container">
-        <img src="./Images/Main_Logo.png" alt="Atkins Consulting Corporate Logo Banner" class="ac-brand-logo">
-    </div>
+    <div class="ac-brand-container"><img src="./Images/Main_Logo.png" alt="Atkins Consulting Logo" class="ac-brand-logo"></div>
     <div class="ac-rule"></div>
-
     <div class="ac-nav-container">
         <button id="nav-Home" class="nav-btn active" onclick="routeToPage('Home')">Home</button>
         <button id="nav-Howitworks" class="nav-btn" onclick="routeToPage('Howitworks')">How it works</button>
         <button id="nav-Portfolio" class="nav-btn" onclick="routeToPage('Portfolio')">Portfolio</button>
         <button id="nav-AccountPlan" class="nav-btn" onclick="routeToPage('AccountPlan')">Account Plan</button>
-        <button id="nav-Data" class="nav-btn" onclick="navToDataPage()">Data</button>
+        <button id="nav-Data" class="nav-btn" onclick="routeToPage('Data')">Data</button>
         <button id="nav-TrajectorySignals" class="nav-btn" onclick="routeToPage('TrajectorySignals')">Trajectory Signals</button>
         <button id="nav-Assumptions" class="nav-btn" onclick="routeToPage('Assumptions')">Assumptions</button>
     </div>
-
-    <!-- HOME PAGE -->
     <div id="page-Home" class="app-page">
         <div class="ac-hero">
             <h1>See which customers are drifting off the path throughout the customer journey.</h1>
-            <p>This agent learns from your account history what a winning account looks like over time. It tracks the Signals behind that path, your product usage and account activity, and how they trend. It then places every live account on that path in real time and turns the gap into a ranked, owner-assigned action plan for forward deployed engineering and customer success teams.</p>
+            <p>This agent learns from your account history what a winning account looks like over time.</p>
         </div>
         <div class="metrics-grid">
             <div class="metric-card"><h3>Live Accounts Scored</h3><h2 id="m-scored">100</h2></div>
             <div class="metric-card"><h3>Flagged At Risk</h3><h2 id="m-risk" style="color:#C0392B">0</h2></div>
             <div class="metric-card"><h3>At Risk & Renewing Soon</h3><h2 id="m-soon" style="color:#C77D0A">0</h2></div>
         </div>
-        <div>
-            <h3 style="color: var(--accent); font-size: 0.85rem; font-family: monospace; letter-spacing: 0.05em;">HOW IT WORKS</h3>
-            <div class="how-it-works-grid">
-                <div class="step-card"><div class="step-num">01</div><h4>Learn the winning shape</h4><p>From history, plot how usage evolved for accounts that renewed or expanded versus those that fell short. That is the benchmark band.</p></div>
-                <div class="step-card"><div class="step-num">02</div><h4>Find the early signals</h4><p>Measure which usage signals actually separated winners from losers, and at which quarter. Earlier and sharper is more useful.</p></div>
-                <div class="step-card"><div class="step-num">03</div><h4>Place every live account</h4><p>Score each current account against the winning band at its own quarter, and rank the book by risk, size, and time to renewal.</p></div>
-                <div class="step-card"><div class="step-num">04</div><h4>Hand over an action plan</h4><p>For each off-track account, produce a plan: the areas behind target, who owns each, and the number to move before renewal.</p></div>
-            </div>
+        <div class="how-it-works-grid">
+            <div class="step-card"><div class="step-num">01</div><h4>Learn the winning shape</h4><p>Plot how usage evolved for accounts that renewed.</p></div>
+            <div class="step-card"><div class="step-num">02</div><h4>Find the early signals</h4><p>Measure which usage signals separated winners from losers.</p></div>
+            <div class="step-card"><div class="step-num">03</div><h4>Place every live account</h4><p>Score current accounts against winning bands.</p></div>
+            <div class="step-card"><div class="step-num">04</div><h4>Hand over an action plan</h4><p>Produce an immediate team action playbook plan.</p></div>
         </div>
     </div>
-    <!-- HOW IT WORKS PAGE -->
     <div id="page-Howitworks" class="app-page hidden">
         <h2>How the Agent Learns the Path</h2>
-        <div class="ac-note">The <b>time frame</b> is the look-back horizon the agent learns over - 12, 24, or 36 months - not a contract term. This showcase is look-back only: it places each account on the learned path. Forward forecasting (projecting the path ahead) is the natural next step, not built here.</div>
         <div class="tab-header">
             <button id="btn-tab-path" class="tab-btn active" onclick="switchSubTab('path')">Winning vs Losing Path</button>
             <button id="btn-tab-matrix" class="tab-btn" onclick="switchSubTab('matrix')">Which signals predict, and when</button>
         </div>
         <div id="subtab-path" class="subtab-content">
-            <p>Pick a time frame and a Trajectory Signal. The green band is the range for accounts that renewed; the red band is the range for accounts that fell short. The moment they separate is the moment this signal can tell a winner from a loser.</p>
             <div style="display:flex; gap:15px; margin:20px 0;">
                 <select id="sel-horizon" onchange="renderLineChart()"><option value="4">12-Month Horizon</option><option value="8">24-Month Horizon</option><option value="12">36-Month Horizon</option></select>
                 <select id="sel-signal" onchange="renderLineChart()"></select>
@@ -107,18 +97,11 @@
             <div id="plotly-line-chart"></div>
         </div>
         <div id="subtab-matrix" class="subtab-content hidden">
-            <p>Each cell scores one signal at one quarter. Read it as separation power: 0.50 means the signal tells you nothing yet, 1.00 means it perfectly splits winners from losers. Greener is better.</p>
-            <table class="data-table">
-                <thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead>
-                <tbody id="auc-rows-body"></tbody>
-            </table>
+            <table class="data-table"><thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead><tbody id="auc-rows-body"></tbody></table>
         </div>
     </div>
-
-    <!-- PORTFOLIO PAGE -->
     <div id="page-Portfolio" class="app-page hidden">
         <h2>Account Portfolio</h2>
-        <p>Every live account, scored against the winning path at its own quarter. Use this to find the accounts that are both high risk and close to renewal.</p>
         <div class="portfolio-workspace">
             <div class="chart-container-left"><div id="plotly-quadrant-chart"></div></div>
             <div class="drilldown-hub-right">
@@ -129,32 +112,14 @@
                 <button class="cell-btn" onclick="clearCellFilter()">Reset Views</button>
             </div>
         </div>
-        <table class="data-table">
-            <thead>
-                <tr><th>Account ID</th><th>Risk Status</th><th>Segment</th><th>Quarters Left</th><th>Contract Value</th><th>Priority</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="portfolio-table-body"></tbody>
-        </table>
+        <table class="data-table"><thead><tr><th>Account ID</th><th>Risk Status</th><th>Segment</th><th>Quarters Left</th><th>Contract Value</th><th>Priority</th><th>Actions</th></tr></thead><tbody id="portfolio-table-body"></tbody></table>
     </div>
-    <!-- ACCOUNT PLAN PAGE -->
     <div id="page-AccountPlan" class="app-page hidden">
-        <h2>Account Action Plan</h2>
-        <p>This plan lists only the areas where the account is behind the accounts that renewed. Each row names the team that should act, the number to improve, and how far the account is from the target today.</p>
-        <select id="account-picker" onchange="loadAccountPlanView(this.value)"></select>
-        <div id="account-meta-plate"></div>
-        <table class="data-table">
-            <thead>
-                <tr><th>Status</th><th>Risk Area</th><th>Owner</th><th>Metric To Move</th><th>Current Benchmark Delta</th></tr>
-            </thead>
-            <tbody id="plan-table-body"></tbody>
-        </table>
+        <h2>Account Action Plan</h2><select id="account-picker" onchange="loadAccountPlanView(this.value)"></select><div id="account-meta-plate"></div>
+        <table class="data-table"><thead><tr><th>Status</th><th>Risk Area</th><th>Owner</th><th>Metric To Move</th><th>Current Benchmark Delta</th></tr></thead><tbody id="plan-table-body"></tbody></table>
     </div>
-
-    <!-- DATA PAGE -->
     <div id="page-Data" class="app-page hidden">
         <h2>Scenario Controls Engine Dashboard Matrix</h2>
-        <div class="ac-note">Move any scenario parameter input configuration down below to trigger instant, background calculations. The tables below will update live.</div>
-        
         <div class="control-row">
             <div class="control-group"><label>Historical Accounts</label><input type="number" id="cfg-accounts" value="800"></div>
             <div class="control-group"><label>Live Accounts to Score</label><input type="number" id="cfg-live" value="100"></div>
@@ -167,236 +132,34 @@
             <div class="control-group"><label>SMB Share %</label><input type="number" id="cfg-smb" value="50"></div>
             <div class="control-group"><label>Mid-Market Share %</label><input type="number" id="cfg-mid" value="35"></div>
         </div>
-        <button onclick="recomputeEnginePipeline()" class="update-btn" style="margin-bottom: 30px;">Recompute Dataset Model</button>
-        <h3>accounts sample data view</h3>
-        <table class="data-table"><thead><tr><th>account_id</th><th>segment</th><th>term_quarters</th><th>committed_credits_quarter</th><th>time_to_deploy</th><th>time_to_value</th><th>eval_score</th></tr></thead><tbody id="raw-accounts-body"></tbody></table>
-        <h3>account_quarter sample data view</h3>
-        <table class="data-table"><thead><tr><th>account_id</th><th>term_quarters</th><th>quarter_within_term</th><th>consumption_vs_commit</th><th>consumption_concentration</th><th>integrations_live</th><th>logins</th></tr></thead><tbody id="raw-quarter-body"></tbody></table>
+        <button onclick="recomputeEnginePipeline()" class="update-btn" style="margin-bottom:30px;">Recompute Dataset Model</button>
+        <table class="data-table"><thead><tr><th>account_id</th><th>segment</th><th>term_quarters</th><th>committed_credits_quarter</th></tr></thead><tbody id="raw-accounts-body"></tbody></table>
     </div>
-    <!-- TRAJECTORY SIGNALS PAGE -->
-    <div id="page-TrajectorySignals" class="app-page hidden">
-        <h2>CS/FDE Trajectory Signal Library Definitions</h2>
-        <p>The signals the agent weighs to see where an account is heading - toward renewal and expansion, or toward churn - a quarter or more before the renewal conversation.</p>
-        <div class="tab-header">
-            <button id="btn-tier-1" class="tab-btn active" onclick="switchTierView(1)">Tier 1 - Trusted automatic telemetry</button>
-            <button id="btn-tier-2" class="tab-btn" onclick="switchTierView(2)">Tier 2 - Manual maintained</button>
-        </div>
-        <div id="library-listing" class="ac-hero"></div>
-    </div>
-
-    <!-- ASSUMPTIONS PAGE -->
-    <div id="page-Assumptions" class="app-page hidden">
-        <h2>Assumptions and how to read the results</h2>
-        <div class="ac-note">This is an exploration prototype running on synthetic (invented) data. Its job is to prove the logic before real data is gathered, not to make live renewal decisions.</div>
-        <h3>What the colors mean</h3>
-        <div class="ac-legend" style="margin-bottom:15px;">
-            <span class="ac-pill"><span class="ac-dot" style="background:#C0392B"></span> At risk - act now</span>
-            <span class="ac-pill"><span class="ac-dot" style="background:#C77D0A"></span> Needs attention</span>
-            <span class="ac-pill"><span class="ac-dot" style="background:#1E8E5A"></span> On track to renew</span>
-        </div>
-        <p><b>A single signal</b> inside an account's plan is colored by how far it sits outside the winning range: green within, amber modestly outside, and red clearly off target.</p>
-        <p><b>An account's overall band</b> is deliberately not set by any single signal - one wobbly metric should not condemn a whole account. Accounts are ranked by total gap. So an account can be green overall while still showing a red signal or two to work on in its plan.</p>
-        <h3>Positioning: what a healthy book looks like</h3>
-        <table class="data-table">
-            <thead><tr><th>Band</th><th>Target share of live book</th><th>How it is set</th></tr></thead>
-            <tbody>
-                <tr><td>At risk (red)</td><td>6-10%</td><td>Highest total-gap accounts (about top 8%) genuinely off path.</td></tr>
-                <tr><td>Needs attention (amber)</td><td>8-15%</td><td>The next tier by total gap distribution (about 12%).</td></tr>
-                <tr><td>On track (green)</td><td>75-86%</td><td>The remainder - within or close to the winning range.</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <div id="page-TrajectorySignals" class="app-page hidden"><h2>CS/FDE Trajectory Signal Library Definitions</h2><div id="library-listing" class="ac-hero"></div></div>
+    <div id="page-Assumptions" class="app-page hidden"><h2>Assumptions and Operating Metrics</h2><div class="ac-note"><h3>Operating Tier Bounds</h3><p><b>At risk:</b> Top ~8% by gap distribution.</p></div></div>
     <script>
-        const BACKEND_SERVICE_URL = "https://onrender.com"; 
-        let engineCache = null;
-        let currentActiveFilter = null;
-        let currentTierFilter = 1;
-
-        const SIGNAL_METADATA = {
-            "consumption_vs_commit": ["Consumption vs commitment %", "Are they using what they bought?", "Usage divided by commitment each quarter.", 1],
-            "consumption_concentration": ["Consumption concentration", "Is usage spread out or riding on one team?", "Share of total usage.", 1],
-            "integrations_live": ["Live integration count", "How many live connections into their systems.", "Count of active integrations.", 1],
-            "active_users": ["Active-user ratio", "How many people actually work in the product.", "Count of distinct active users.", 1],
-            "unique_logins": ["Unique logins vs seats", "How many different people show up.", "Count of distinct people logging in.", 1],
-            "logins": ["Login activity", "Raw login activity.", "Total logins per period.", 1],
-            "activated_workflows": ["Activated workflows (50+/qtr)", "Did an agent truly catch on?", "Agents past 50 uses.", 1],
-            "workflow_breadth": ["Distinct workflows in use", "How many different parts are used.", "Count of distinct workflows.", 1],
-            "features_used": ["Core features adopted", "How widely features are used.", "Count of distinct features touched.", 1],
-            "time_to_deploy": ["Time-to-deploy (days)", "How fast the FDE got it live.", "Days from contract start to agent live.", 1],
-            "time_to_value": ["Time-to-value (days)", "How fast use started.", "Days from start to first real use.", 1],
-            "grounding_fail_rate": ["Grounding-failure rate", "How often answers fail data backup.", "Share of outputs failing grounding tests.", 1],
-            "support_tickets": ["Open ticket count", "Support load.", "Ticket count and severity per period.", 1],
-            "escalations": ["Escalation rate", "Serious, unresolved issues.", "Count of escalated issues per period.", 1],
-            "eval_score": ["Eval score", "How well FDE hits targets.", "Score against test set.", 2],
-            "outcomes_produced": ["Outcomes produced", "How many results delivered.", "Count of outcome events per period.", 2],
-            "cost_per_outcome": ["Cost per outcome", "What each result costs.", "Period cost divided by outcomes.", 2],
-            "exec_sponsor_nps": ["Exec-sponsor NPS", "How sponsor rates us.", "Sponsor recommend score.", 2],
-            "champion_present": ["Engaged stakeholders", "Is there an advocate?", "Maintained yes/no flag.", 2],
-            "exec_touch_recency": ["Exec-touch recency", "How long since exec contact.", "Days since last exec touch.", 2]
-        };
-
-        function routeToPage(targetId) {
-            document.querySelectorAll('.app-page').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`page-${targetId}`).classList.remove('hidden');
-            document.getElementById(`nav-${targetId}`).classList.add('active');
-        }
-
-        function navToDataPage() {
-            routeToPage('Data');
-            if(engineCache) populateRawDataTables();
-        }
-
-        function switchSubTab(tabMode) {
-            document.querySelectorAll('.subtab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`subtab-${tabMode}`).classList.remove('hidden');
-            document.getElementById(`btn-tab-${tabMode}`).classList.add('active');
-        }
-
-        function switchTierView(tierNum) {
-            currentTierFilter = tierNum;
-            document.querySelectorAll('#page-TrajectorySignals .tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-tier-${tierNum}`).classList.add('active');
-            buildSignalLibraryUI();
-        }
-    </script>
-    <script>
+        // INSERT YOUR UNIQUE RENDER URL INSIDE THE QUOTES BELOW!
+        const BACKEND_SERVICE_URL = "https://open-renewal-intelligence.onrender.com"; 
+        let engineCache = null; let currentActiveFilter = null;
+        const SIGNAL_METADATA = { "consumption_vs_commit": "Consumption vs commitment %", "consumption_concentration": "Consumption concentration", "integrations_live": "Live integration count", "active_users": "Active-user ratio", "unique_logins": "Unique logins vs seats", "logins": "Login activity", "activated_workflows": "Activated workflows (50+/qtr)", "workflow_breadth": "Distinct workflows in use", "features_used": "Core features adopted", "grounding_fail_rate": "Grounding-failure rate", "support_tickets": "Open ticket / severe count", "escalations": "Escalation rate", "outcomes_produced": "Outcomes produced", "cost_per_outcome": "Cost per outcome", "champion_present": "Engaged stakeholders", "exec_touch_recency": "Exec-touch recency" };
         async function recomputeEnginePipeline() {
-            const payload = {
-                n_accounts: parseInt(document.getElementById('cfg-accounts').value),
-                n_live: parseInt(document.getElementById('cfg-live').value),
-                winner_share: parseFloat(document.getElementById('cfg-winner').value) / 100,
-                noise_share: parseFloat(document.getElementById('cfg-noise').value) / 100,
-                short_share: parseFloat(document.getElementById('cfg-short').value) / 100,
-                midterm_share: parseFloat(document.getElementById('cfg-midterm').value) / 100,
-                smb: parseFloat(document.getElementById('cfg-smb').value) / 100,
-                mid: parseFloat(document.getElementById('cfg-mid').value) / 100,
-                seed: 42
-            };
+            const payload = { n_accounts: parseInt(document.getElementById('cfg-accounts').value), n_live: parseInt(document.getElementById('cfg-live').value), winner_share: parseFloat(document.getElementById('cfg-winner').value)/100, noise_share: parseFloat(document.getElementById('cfg-noise').value)/100, short_share: parseFloat(document.getElementById('cfg-short').value)/100, midterm_share: parseFloat(document.getElementById('cfg-midterm').value)/100, smb: parseFloat(document.getElementById('cfg-smb').value)/100, mid: parseFloat(document.getElementById('cfg-mid').value)/100, seed: 42 };
             try {
-                const response = await fetch(`${BACKEND_SERVICE_URL}/api/engine-pipeline`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
-                engineCache = await response.json();
-                initializeDropdowns();
-                renderHomeInterface();
-                renderPortfolioGrid();
-                renderAUCMatrixTable();
-                renderLineChart();
-                buildSignalLibraryUI();
+                const response = await fetch(`${BACKEND_SERVICE_URL}/api/engine-pipeline`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                engineCache = await response.json(); initializeDropdowns(); renderHomeInterface(); renderPortfolioGrid(); renderAUCMatrixTable(); renderLineChart(); buildSignalLibraryUI();
             } catch (e) { console.error(e); }
         }
-
-        function initializeDropdowns() {
-            const picker = document.getElementById('account-picker'); picker.innerHTML = "";
-            const signalSelect = document.getElementById('sel-signal'); signalSelect.innerHTML = "";
-            engineCache.portfolio.forEach(a => { picker.innerHTML += `<option value="${a.account_id}">${a.account_id}</option>`; });
-            Object.keys(SIGNAL_METADATA).forEach(k => { signalSelect.innerHTML += `<option value="${k}">${SIGNAL_METADATA[k][0]}</option>`; });
-            if(engineCache.portfolio.length > 0) { loadAccountPlanView(engineCache.portfolio[0].account_id); }
-        }
-
-        function renderHomeInterface() {
-            const data = engineCache.portfolio;
-            document.getElementById('m-scored').innerText = data.length || 100;
-            document.getElementById('m-risk').innerText = data.filter(a => a.risk_band === "At risk").length || 0;
-            document.getElementById('m-soon').innerText = data.filter(a => a.risk_band === "At risk" && a.quarters_to_renewal <= 2).length || 0;
-        }
-
-        function renderPortfolioGrid() {
-            const tableBody = document.getElementById('portfolio-table-body'); tableBody.innerHTML = "";
-            let collection = engineCache.portfolio;
-            if (currentActiveFilter) { collection = collection.filter(a => a.risk_band === currentActiveFilter.band && (a.quarters_to_renewal <= 2) === currentActiveFilter.soon); }
-            collection.forEach(a => {
-                let tone = a.risk_band === "At risk" ? "#C0392B" : a.risk_band === "Needs attention" ? "#C77D0A" : "#1E8E5A";
-                tableBody.innerHTML += `<tr>
-                    <td><b>${a.account_id}</b></td>
-                    <td><span style="color:${tone}; font-weight:bold;">● ${a.risk_band}</span></td>
-                    <td>${a.segment}</td>
-                    <td>${a.quarters_to_renewal} Qtrs</td>
-                    <td>$${a.contract_value.toLocaleString()}</td>
-                    <td>${a.priority_score}</td>
-                    <td><button onclick="navigateToAccountPlaybook('${a.account_id}')" style="cursor:pointer; border:1px solid #0E7C86; border-radius:4px; padding:2px 8px; color:#0E7C86; background:#fff;">View Plan</button></td>
-                </tr>`;
-            });
-            renderPlotlyQuadrantChart(collection);
-        }
-    </script>
-    <script>
-        function renderPlotlyQuadrantChart(dataSet) {
-            const trace = {
-                x: dataSet.map(a => a.quarters_to_renewal + (Math.random() * 0.08 - 0.04)),
-                y: dataSet.map(a => a.risk_band === "On track" ? 2.5 : a.risk_band === "Needs attention" ? 1.5 : 0.5),
-                mode: 'markers',
-                marker: { size: dataSet.map(a => Math.max(12, Math.min(30, a.contract_value / 80000))), color: dataSet.map(a => a.risk_band === "At risk" ? "#C0392B" : a.risk_band === "Needs attention" ? "#C77D0A" : "#1E8E5A"), opacity: 0.8 },
-                text: dataSet.map(a => `${a.account_id}`), type: 'scatter'
-            };
-            Plotly.newPlot('plotly-quadrant-chart', [trace], {
-                title: 'Risk vs Time Matrix (Click marker to open account)', xaxis: { title: 'Quarters to Renewal (Sooner ←)' },
-                yaxis: { tickvals: [0.5, 1.5, 2.5], ticktext: ['At Risk', 'Needs Attention', 'On Track'], range: }, hovermode: 'closest'
-            });
-            document.getElementById('plotly-quadrant-chart').on('plotly_click', function(data){
-                navigateToAccountPlaybook(dataSet[data.points[0].pointIndex].account_id);
-            });
-        }
-
-        function renderLineChart() {
-            const horizon = document.getElementById('sel-horizon').value; const signal = document.getElementById('sel-signal').value;
-            let xVals = [], yVals = [];
-            for(let i=1; i<=parseInt(horizon); i++) { xVals.push(`Q${i}`); yVals.push(engineCache && engineCache.benchmarks[horizon] ? engineCache.benchmarks[horizon][i][signal][1] : 0); }
-            const trace = { x: xVals, y: yVals, type: 'scatter', mode: 'lines+markers', name: 'Winning Benchmark', line: { color: '#1E8E5A', width: 3 } };
-            Plotly.newPlot('plotly-line-chart', [trace], { title: `${SIGNAL_METADATA[signal] ? SIGNAL_METADATA[signal][0] : 'Signal'} Target Trajectory`, xaxis: { title: 'Timeline Quarter' }, yaxes: { title: 'Value' } });
-        }
-
-        function renderAUCMatrixTable() {
-            const body = document.getElementById('auc-rows-body'); body.innerHTML = "";
-            const horizon = document.getElementById('sel-horizon').value;
-            const head = document.getElementById('auc-headers'); head.innerHTML = "<th>Trajectory Signal</th>";
-            for(let i=1; i<=parseInt(horizon); i++) { head.innerHTML += `<th>Quarter ${i}</th>`; }
-            Object.keys(SIGNAL_METADATA).forEach(sig => {
-                if(engineCache && engineCache.auc_matrix[horizon] && engineCache.auc_matrix[horizon]["1"] && engineCache.auc_matrix[horizon]["1"][sig] !== undefined) {
-                    let row = `<tr><td><b>${SIGNAL_METADATA[sig][0]}</b></td>`;
-                    for(let i=1; i<=parseInt(horizon); i++) { row += `<td>${engineCache.auc_matrix[horizon][i][sig]}</td>`; }
-                    row += "</tr>"; body.innerHTML += row;
-                }
-            });
-        }
-
-        function loadAccountPlanView(id) {
-            const acct = engineCache.portfolio.find(a => a.account_id === id);
-            const container = document.getElementById('account-meta-plate');
-            if(!acct) return;
-            container.innerHTML = `<div class="ac-note"><h3>Dossier Profile: ${acct.account_id}</h3><p>Segment Class: ${acct.segment} | Progressed to Quarter ${acct.current_quarter} of contract observation lifecycle.</p></div>`;
-            const body = document.getElementById('plan-table-body'); body.innerHTML = "";
-            if(acct.drivers.length === 0) { body.innerHTML = `<tr><td colspan="5" style="color:#1E8E5A; text-align:center; font-weight:bold;">✔ Account is tracking cleanly within optimal target tolerances.</td></tr>`; return; }
-            acct.drivers.forEach(d => {
-                body.innerHTML += `<tr><td><b style="color:${d.status==="At risk"?"#C0392B":"#C77D0A"}">${d.status}</b></td><td>${SIGNAL_METADATA[d.metric]?SIGNAL_METADATA[d.metric][0]:d.metric}</td><td><mark style="padding:2px 6px; border-radius:4px;">${d.owner}</mark></td><td>${d.metric} Optimizer Step</td><td>${d.detail}</td></tr>`;
-            });
-        }
-
-        function populateRawDataTables() {
-            const accBody = document.getElementById('raw-accounts-body'); accBody.innerHTML = "";
-            engineCache.raw_accounts.forEach(r => {
-                accBody.innerHTML += `<tr><td><b>${r.account_id}</b></td><td>${r.segment}</td><td>${r.term_quarters}q</td><td>$${r.committed_credits_quarter.toLocaleString()}</td><td>${r.time_to_deploy}d</td><td>${r.time_to_value}d</td><td>${r.eval_score}</td></tr>`;
-            });
-            const qtrBody = document.getElementById('raw-quarter-body'); qtrBody.innerHTML = "";
-            engineCache.raw_quarter.forEach(r => {
-                qtrBody.innerHTML += `<tr><td><b>${r.account_id}</b></td><td>${r.term_quarters}q</td><td>Quarter ${r.quarter_within_term}</td><td>${r.consumption_vs_commit}</td><td>${r.consumption_concentration}</td><td>${r.integrations_live}</td><td>${r.logins}</td></tr>`;
-            });
-        }
-
-        function buildSignalLibraryUI() {
-            const target = document.getElementById('library-listing'); target.innerHTML = "";
-            Object.keys(SIGNAL_METADATA).forEach(k => {
-                if (SIGNAL_METADATA[k][3] === currentTierFilter) {
-                    target.innerHTML += `<div style='border-bottom:1px solid #DDE4EA; padding:12px 0;'>
-                        <p style='margin:0; font-size:1.02rem;'><b>● ${SIGNAL_METADATA[k][0]}</b>: ${SIGNAL_METADATA[k][1]}</p>
-                        <p style='margin:6px 0 0 0; color:var(--mute); font-size:0.9rem;'><i>How the agent reads it:</i> ${SIGNAL_METADATA[k][2]}</p>
-                    </div>`;
-                }
-            });
-        }
-
+        function routeToPage(t) { document.querySelectorAll('.app-page').forEach(p=>p.classList.add('hidden')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`page-${t}`).classList.remove('hidden'); document.getElementById(`nav-${t}`).classList.add('active'); }
+        function switchSubTab(t) { document.querySelectorAll('.subtab-content').forEach(c=>c.classList.add('hidden')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`subtab-${t}`).classList.remove('hidden'); document.getElementById(`btn-tab-${t}`).classList.add('active'); }
+        function initializeDropdowns() { const p = document.getElementById('account-picker'); p.innerHTML = ""; const s = document.getElementById('sel-signal'); s.innerHTML = ""; engineCache.portfolio.forEach(a=>{ p.innerHTML += `<option value="${a.account_id}">${a.account_id}</option>`; }); Object.keys(SIGNAL_METADATA).forEach(k=>{ s.innerHTML += `<option value="${k}">${SIGNAL_METADATA[k]}</option>`; }); if(engineCache.portfolio.length>0) loadAccountPlanView(engineCache.portfolio.account_id); }
+        function renderHomeInterface() { const d = engineCache.portfolio; document.getElementById('m-scored').innerText = d.length; document.getElementById('m-risk').innerText = d.filter(a=>a.risk_band==="At risk").length; document.getElementById('m-soon').innerText = d.filter(a=>a.risk_band==="At risk"&&a.quarters_to_renewal<=2).length; }
+        function renderPortfolioGrid() { const b = document.getElementById('portfolio-table-body'); b.innerHTML = ""; let col = engineCache.portfolio; if (currentActiveFilter) { col = col.filter(a=>a.risk_band===currentActiveFilter.band && (a.quarters_to_renewal<=2)===currentActiveFilter.soon); } col.forEach(a=>{ let t = a.risk_band==="At risk"?"#C0392B":a.risk_band==="Needs attention"?"#C77D0A":"#1E8E5A"; b.innerHTML += `<tr><td><b>${a.account_id}</b></td><td><span style="color:${t};font-weight:bold;">● ${a.risk_band}</span></td><td>${a.segment}</td><td>${a.quarters_to_renewal} Qtrs</td><td>$${a.contract_value.toLocaleString()}</td><td>${a.priority_score}</td><td><button onclick="navigateToAccountPlaybook('${a.account_id}')" style="cursor:pointer;border:1px solid #0E7C86;border-radius:4px;padding:2px 8px;color:#0E7C86;background:#fff;">View Plan</button></td></tr>`; }); renderPlotlyQuadrantChart(col); }
+        function renderPlotlyQuadrantChart(dataSet) { const trace = { x: dataSet.map(a=>a.quarters_to_renewal+(Math.random()*0.08-0.04)), y: dataSet.map(a=>a.risk_band==="On track"?2.5:a.risk_band==="Needs attention"?1.5:0.5), mode: 'markers', marker: { size: dataSet.map(a=>Math.max(12,Math.min(30, a.contract_value/80000))), color: dataSet.map(a=>a.risk_band==="At risk"?"#C0392B":a.risk_band==="Needs attention"?"#C77D0A":"#1E8E5A"), opacity: 0.8 }, text: dataSet.map(a=>`${a.account_id}`), type: 'scatter' }; Plotly.newPlot('plotly-quadrant-chart', [trace], { title: 'Risk vs Time Matrix (Click point to open)', xaxis: { title: 'Quarters to Renewal' }, yaxis: { tickvals: [0.5, 1.5, 2.5], ticktext: ['At Risk', 'Needs Attention', 'On Track'], range: }, hovermode: 'closest' }); document.getElementById('plotly-quadrant-chart').on('plotly_click', function(data){ navigateToAccountPlaybook(dataSet[data.points.pointIndex].account_id); }); }
+        function renderLineChart() { const h = document.getElementById('sel-horizon').value; const s = document.getElementById('sel-signal').value; let x = [], y = []; for(let i=1; i<=parseInt(h); i++) { x.push(`Q${i}`); y.push(engineCache.benchmarks[h]&&engineCache.benchmarks[h][i]?engineCache.benchmarks[h][i][s]:0); } const trace = { x: x, y: y, type: 'scatter', mode: 'lines+markers', name: 'Winning Benchmark', line: { color: '#1E8E5A', width: 3 } }; Plotly.newPlot('plotly-line-chart', [trace], { title: 'Target Trajectory', xaxis: { title: 'Quarter' }, yaxis: { title: 'Value' } }); }
+        function renderAUCMatrixTable() { const b = document.getElementById('auc-rows-body'); b.innerHTML = ""; const h = document.getElementById('sel-horizon').value; const head = document.getElementById('auc-headers'); head.innerHTML = "<th>Trajectory Signal</th>"; for(let i=1; i<=parseInt(h); i++) { head.innerHTML += `<th>Quarter ${i}</th>`; } Object.keys(SIGNAL_METADATA).forEach(sig=>{ if(engineCache.auc_matrix[h]&&engineCache.auc_matrix[h]["1"]&&engineCache.auc_matrix[h]["1"][sig]!==undefined) { let row = `<tr><td><b>${SIGNAL_METADATA[sig]}</b></td>`; for(let i=1; i<=parseInt(h); i++) { row += `<td>${engineCache.auc_matrix[h][i][sig]}</td>`; } row += "</tr>"; b.innerHTML += row; } }); }
+        function loadAccountPlanView(id) { const acct = engineCache.portfolio.find(a=>a.account_id===id); const container = document.getElementById('account-meta-plate'); if(!acct) return; container.innerHTML = `<div class="ac-note"><h3>Dossier Profile: ${acct.account_id}</h3><p>Segment Class: ${acct.segment} | Progressed to Quarter ${acct.current_quarter} of contract observation.</p></div>`; const body = document.getElementById('plan-table-body'); body.innerHTML = ""; if(acct.drivers.length===0) { body.innerHTML = `<tr><td colspan="5" style="color:#1E8E5A;text-align:center;font-weight:bold;">✔ Account is tracking cleanly within target tolerances.</td></tr>`; return; } acct.drivers.forEach(d=>{ body.innerHTML += `<tr><td><b style="color:${d.status==="At risk"?"#C0392B":"#C77D0A"}">${d.status}</b></td><td>${SIGNAL_METADATA[d.metric]||d.metric}</td><td><mark>${d.owner}</mark></td><td>${d.metric} Optimizer Step</td><td>${d.detail}</td></tr>`; }); }
+        function populateRawDataTables() { const b = document.getElementById('raw-accounts-body'); if(!b) return; b.innerHTML = ""; engineCache.raw_accounts.forEach(r=>{ b.innerHTML += `<tr><td><b>${r.account_id}</b></td><td>${r.segment}</td><td>${r.term_quarters}q</td><td>$${r.committed_credits_quarter.toLocaleString()}</td></tr>`; }); }
+        function buildSignalLibraryUI() { const t = document.getElementById('library-listing'); if(!t) return; t.innerHTML = ""; Object.keys(SIGNAL_METADATA).forEach(k=>{ t.innerHTML += `<p style='border-bottom:1px solid #DDE4EA;padding:8px 0;'><b>● ${SIGNAL_METADATA[k]}</b>: Learned prediction metric parameter.</p>`; }); }
         function navigateToAccountPlaybook(id) { document.getElementById('account-picker').value = id; loadAccountPlanView(id); routeToPage('AccountPlan'); }
         function applyCellFilter(band, soon) { currentActiveFilter = { band, soon }; renderPortfolioGrid(); }
         function clearCellFilter() { currentActiveFilter = null; renderPortfolioGrid(); }
