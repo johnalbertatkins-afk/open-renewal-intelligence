@@ -3,23 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Atkins Consulting | Renewal Intelligence Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Load Plotly Graphics Core Engine -->
+    <!-- Load Plotly Visual Engine Core -->
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono&display=swap');
+
+        :root {
+            --ink: #0E2233;
+            --surface: #F4F6F8;
+            --card: #FFFFFF;
+            --accent: #0E7C86;
+            --line: #DDE4EA;
+            --mute: #5A6B78;
+            --green: #1E8E5A;
+            --amber: #C77D0A;
+            --red: #C0392B;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--surface);
+            color: var(--ink);
+            margin: 0; padding: 24px;
+            padding-bottom: 90px;
+        }
+
+        .ac-brandbar { display: flex; align-items: center; gap: 14px; }
+        .ac-mark {
+            width: 40px; height: 40px; border-radius: 10px; background: var(--ink);
+            color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ac-word { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); }
+        .ac-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--mute); text-transform: uppercase; margin-top: 3px; }
+        .ac-rule { height: 3px; width: 100%; background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 55%, transparent 100%); margin: 8px 0 20px 0; }
+
+        .ac-nav-container { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+        .nav-btn {
+            background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+            padding: 8px 16px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.2s ease-in-out;
+        }
+        .nav-btn.active, .nav-btn:hover { background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+
+        .ac-hero { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(14,34,51,0.04); }
+        .ac-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin: 0 0 12px 0; line-height: 1.2; }
+        .ac-hero p { font-size: 1.02rem; color: var(--mute); line-height: 1.6; margin: 0; }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .metric-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .metric-card h3 { margin: 0; font-size: 0.85rem; color: var(--mute); text-transform: uppercase; letter-spacing: 0.05em; }
+        .metric-card h2 { margin: 10px 0 0 0; font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; }
+
+        .portfolio-workspace { display: flex; gap: 20px; margin-bottom: 20px; }
+        .chart-container-left { flex: 2; background: var(--card); border-radius: 12px; border: 1px solid var(--line); padding: 16px; }
+        .drilldown-hub-right { flex: 1; background: var(--card); border-radius: 12px; border: 1px solid var(--line); padding: 20px; }
+
+        .cell-btn { display: block; width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; border: 1px solid var(--line); background: var(--card); border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.15s ease; }
+        .cell-btn:hover { background: #F8FAFC; border-color: var(--mute); }
+
+        .data-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
+        .data-table th, .data-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+        .data-table th { background: #F8FAFC; color: var(--mute); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.02em; }
+
+        .tab-header { display: flex; gap: 4px; border-bottom: 2px solid var(--line); margin-bottom: 20px; }
+        .tab-btn { background: none; border: none; padding: 12px 24px; font-weight: 600; cursor: pointer; color: var(--mute); }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); margin-bottom: -2px; }
+
+        .ac-note { background: #EEF4F5; border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin: 20px 0; }
+        .global-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 24px; align-items: center; box-sizing: border-box; z-index: 1000; box-shadow: 0 -4px 12px rgba(14,34,51,0.06); }
+        .update-btn { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .update-btn:hover { background: var(--ink); }
+        select { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background-color: var(--card); font-family: inherit; font-size: 0.9rem; color: var(--ink); margin-bottom: 15px; }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-    <!-- Unified Brand Plate Panel -->
     <div class="ac-brandbar">
         <div class="ac-mark">AC</div>
         <div>
             <div class="ac-word">Atkins Consulting</div>
-            <div class="ac-tag">Adoption and Value Realization for Customer Success and Forward Deployed Engineering</div>
+            <div class="ac-tag">Adoption and Value Realization Framework Matrix</div>
         </div>
     </div>
     <div class="ac-rule"></div>
 
-    <!-- Multi-page Router Buttons -->
     <div class="ac-nav-container">
         <button id="nav-Home" class="nav-btn active" onclick="routeToPage('Home')">Home</button>
         <button id="nav-Howitworks" class="nav-btn" onclick="routeToPage('Howitworks')">How it works</button>
@@ -29,12 +98,11 @@
         <button id="nav-Assumptions" class="nav-btn" onclick="routeToPage('Assumptions')">Assumptions</button>
     </div>
 
-    <!-- Page Content Segments -->
-    <!-- HOME PAGE -->
+    <!-- HOME TAB -->
     <div id="page-Home" class="app-page">
         <div class="ac-hero">
-            <h1>See which customers are drifting off the adoption and value realization path throughout the customer journey.</h1>
-            <p>This agent learns from your account history what a winning account looks like over time. It tracks product usage and account activity trends to place live accounts onto owner-assigned tactical frameworks.</p>
+            <h1>See which customers are drifting off the path throughout the customer journey.</h1>
+            <p>This agent learns from your account history what a winning account looks like over time to place live accounts onto owner-assigned tactical frameworks.</p>
         </div>
         <div class="metrics-grid">
             <div class="metric-card"><h3>Live Accounts Scored</h3><h2 id="m-scored">100</h2></div>
@@ -43,7 +111,7 @@
         </div>
     </div>
 
-    <!-- HOW IT WORKS PAGE -->
+    <!-- HOW IT WORKS TAB -->
     <div id="page-Howitworks" class="app-page hidden">
         <div class="ac-hero">
             <h2>How the Agent Learns the Path</h2>
@@ -51,7 +119,6 @@
                 <button id="btn-tab-path" class="tab-btn active" onclick="switchSubTab('path')">Winning vs Losing Path</button>
                 <button id="btn-tab-matrix" class="tab-btn" onclick="switchSubTab('matrix')">Predictive Power Matrix (AUC)</button>
             </div>
-            
             <div id="subtab-path" class="subtab-content">
                 <div style="display:flex; gap:15px; margin:20px 0;">
                     <select id="sel-horizon" onchange="renderLineChart()"><option value="4">12-Month Horizon</option><option value="8">24-Month Horizon</option><option value="12">36-Month Horizon</option></select>
@@ -59,7 +126,6 @@
                 </div>
                 <div id="plotly-line-chart"></div>
             </div>
-            
             <div id="subtab-matrix" class="subtab-content hidden">
                 <table class="data-table">
                     <thead><tr id="auc-headers"><th>Trajectory Signal</th></tr></thead>
@@ -69,7 +135,7 @@
         </div>
     </div>
 
-    <!-- PORTFOLIO PAGE -->
+    <!-- PORTFOLIO TAB -->
     <div id="page-Portfolio" class="app-page hidden">
         <h2>Account Portfolio</h2>
         <div class="portfolio-workspace">
@@ -90,7 +156,7 @@
         </table>
     </div>
 
-    <!-- ACCOUNT PLAN PAGE -->
+    <!-- ACCOUNT PLAN TAB -->
     <div id="page-AccountPlan" class="app-page hidden">
         <h2>Account Action Plan</h2>
         <select id="account-picker" onchange="loadAccountPlanView(this.value)"></select>
@@ -103,13 +169,13 @@
         </table>
     </div>
 
-    <!-- TRAJECTORY SIGNALS PAGE -->
+    <!-- SIGNALS TAB -->
     <div id="page-TrajectorySignals" class="app-page hidden">
         <h2>CS/FDE Trajectory Signal Library Definitions</h2>
         <div id="library-listing" class="ac-hero"></div>
     </div>
 
-    <!-- ASSUMPTIONS PAGE -->
+    <!-- ASSUMPTIONS TAB -->
     <div id="page-Assumptions" class="app-page hidden">
         <h2>Assumptions and Operating Metrics</h2>
         <div class="ac-note">
@@ -120,13 +186,187 @@
         </div>
     </div>
 
-    <!-- Floating Dashboard Global Control Panel -->
     <div class="global-controls">
-        <label>Live Accounts to Score: <input type="number" id="ctrl-live" value="100" min="10" max="200"></label>
-        <label>Winner Mix Rate %: <input type="number" id="ctrl-winner" value="70" min="40" max="95"></label>
+        <label>Live Accounts to Score: <input type="number" id="ctrl-live" value="100"></label>
+        <label>Winner Mix Rate %: <input type="number" id="ctrl-winner" value="70"></label>
         <button onclick="recomputeEnginePipeline()" class="update-btn">Recompute Engine Pipeline</button>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const BACKEND_SERVICE_URL = "https://open-renewal-agent.onrender.com"; 
+        let engineCache = null;
+        let currentActiveFilter = null;
+
+        const SIGNAL_METADATA = {
+            "consumption_vs_commit": "Consumption vs commitment %",
+            "consumption_concentration": "Consumption concentration",
+            "integrations_live": "Live integration count",
+            "active_users": "Active-user ratio",
+            "unique_logins": "Unique logins vs seats",
+            "logins": "Login activity",
+            "activated_workflows": "Activated workflows (50+/qtr)",
+            "workflow_breadth": "Distinct workflows in use",
+            "features_used": "Core features adopted",
+            "grounding_fail_rate": "Grounding-failure rate",
+            "support_tickets": "Open ticket / severe count",
+            "escalations": "Escalation rate",
+            "outcomes_produced": "Outcomes produced",
+            "cost_per_outcome": "Cost per outcome",
+            "champion_present": "Engaged stakeholders",
+            "exec_touch_recency": "Exec-touch recency"
+        };
+
+        async function recomputeEnginePipeline() {
+            const payload = {
+                n_accounts: 800, n_live: parseInt(document.getElementById('ctrl-live').value),
+                winner_share: parseFloat(document.getElementById('ctrl-winner').value) / 100,
+                noise_share: 0.12, short_share: 0.55, midterm_share: 0.30, smb: 0.50, mid: 0.35, seed: 42
+            };
+            try {
+                const response = await fetch(`${BACKEND_SERVICE_URL}/api/engine-pipeline`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                engineCache = await response.json();
+                initializeDropdowns();
+                renderHomeInterface();
+                renderPortfolioGrid();
+                renderAUCMatrixTable();
+                renderLineChart();
+                buildSignalLibraryUI();
+            } catch (e) {
+                console.error("Connection failure: ", e);
+            }
+        }
+
+        function routeToPage(targetId) {
+            document.querySelectorAll('.app-page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`page-${targetId}`).classList.remove('hidden');
+            document.getElementById(`nav-${targetId}`).classList.add('active');
+        }
+
+        function switchSubTab(tabMode) {
+            document.querySelectorAll('.subtab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`subtab-${tabMode}`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tabMode}`).classList.add('active');
+        }
+
+        function initializeDropdowns() {
+            const picker = document.getElementById('account-picker'); picker.innerHTML = "";
+            const signalSelect = document.getElementById('sel-signal'); signalSelect.innerHTML = "";
+            engineCache.portfolio.forEach(a => { picker.innerHTML += `<option value="${a.account_id}">${a.account_id} (${a.segment})</option>`; });
+            Object.keys(SIGNAL_METADATA).forEach(k => { signalSelect.innerHTML += `<option value="${k}">${SIGNAL_METADATA[k]}</option>`; });
+            if(engineCache.portfolio.length > 0) { loadAccountPlanView(engineCache.portfolio[0].account_id); }
+        }
+
+        function renderHomeInterface() {
+            const data = engineCache.portfolio;
+            document.getElementById('m-scored').innerText = data.length;
+            document.getElementById('m-risk').innerText = data.filter(a => a.risk_band === "At risk").length;
+            document.getElementById('m-soon').innerText = data.filter(a => a.risk_band === "At risk" && a.quarters_to_renewal <= 2).length;
+        }
+
+        function renderPortfolioGrid() {
+            const tableBody = document.getElementById('portfolio-table-body'); tableBody.innerHTML = "";
+            let collection = engineCache.portfolio;
+            if (currentActiveFilter) { collection = collection.filter(a => a.risk_band === currentActiveFilter.band && (a.quarters_to_renewal <= 2) === currentActiveFilter.soon); }
+            collection.forEach(a => {
+                let tone = a.risk_band === "At risk" ? "#C0392B" : a.risk_band === "Needs attention" ? "#C77D0A" : "#1E8E5A";
+                tableBody.innerHTML += `<tr>
+                    <td><b>${a.account_id}</b></td>
+                    <td><span style="color:${tone}; font-weight:bold;">● ${a.risk_band}</span></td>
+                    <td>${a.segment}</td>
+                    <td>${a.quarters_to_renewal} Quarters</td>
+                    <td>$${a.contract_value.toLocaleString()}</td>
+                    <td>${a.priority_score}</td>
+                    <td><button onclick="navigateToAccountPlaybook('${a.account_id}')" style="cursor:pointer; border:1px solid #0E7C86; border-radius:4px; padding:2px 8px; color:#0E7C86; background:#fff;">View Plan</button></td>
+                </tr>`;
+            });
+            renderPlotlyQuadrantChart(collection);
+        }
+
+        function renderPlotlyQuadrantChart(dataSet) {
+            const trace = {
+                x: dataSet.map(a => a.quarters_to_renewal + (Math.random() * 0.08 - 0.04)),
+                y: dataSet.map(a => a.risk_band === "On track" ? 2.5 : a.risk_band === "Needs attention" ? 1.5 : 0.5),
+                mode: 'markers',
+                marker: { size: dataSet.map(a => Math.max(10, Math.min(32, a.contract_value / 80000))), color: dataSet.map(a => a.risk_band === "At risk" ? "#C0392B" : a.risk_band === "Needs attention" ? "#C77D0A" : "#1E8E5A"), opacity: 0.8 },
+                text: dataSet.map(a => `${a.account_id}<br>Value: $${a.contract_value.toLocaleString()}`), type: 'scatter'
+            };
+            Plotly.newPlot('plotly-quadrant-chart', [trace], {
+                title: 'Risk vs Time Matrix (Click marker to open)',
+                xaxis: { title: 'Quarters to Renewal' },
+                yaxis: { tickvals: [0.5, 1.5, 2.5], ticktext: ['At Risk', 'Needs Attention', 'On Track'], range: [0, 3] },
+                hovermode: 'closest'
+            });
+            document.getElementById('plotly-quadrant-chart').on('plotly_click', function(data){
+                navigateToAccountPlaybook(dataSet[data.points[0].pointIndex].account_id);
+            });
+        }
+
+        function renderLineChart() {
+            const horizon = document.getElementById('sel-horizon').value;
+            const signal = document.getElementById('sel-signal').value;
+            let xVals = [], yVals = [];
+            for(let i=1; i<=parseInt(horizon); i++) {
+                xVals.push(`Q${i}`);
+                if (engineCache && engineCache.benchmarks && engineCache.benchmarks[horizon] && engineCache.benchmarks[horizon][i]) {
+                    yVals.push(engineCache.benchmarks[horizon][i][signal][1]); 
+                } else {
+                    yVals.push(0);
+                }
+            }
+            const benchmarkTrace = { x: xVals, y: yVals, type: 'scatter', mode: 'lines+markers', name: 'Winning Benchmark', line: { color: '#1E8E5A', width: 3 } };
+            Plotly.newPlot('plotly-line-chart', [benchmarkTrace], { title: `${SIGNAL_METADATA[signal] || signal} Median Path Trajectory`, xaxis: { title: 'Timeline Interval Quarter' }, yaxis: { title: 'Calculated Scalar Value' } });
+        }
+
+        function renderAUCMatrixTable() {
+            const body = document.getElementById('auc-rows-body'); body.innerHTML = "";
+            const horizon = document.getElementById('sel-horizon').value;
+            const head = document.getElementById('auc-headers'); head.innerHTML = "<th>Trajectory Signal</th>";
+            for(let i=1; i<=parseInt(horizon); i++) { head.innerHTML += `<th>Quarter ${i}</th>`; }
+            Object.keys(SIGNAL_METADATA).forEach(sig => {
+                if(engineCache && engineCache.auc_matrix && engineCache.auc_matrix[horizon] && engineCache.auc_matrix[horizon]["1"] && engineCache.auc_matrix[horizon]["1"][sig] !== undefined) {
+                    let row = `<tr><td><b>${SIGNAL_METADATA[sig]}</b></td>`;
+                    for(let i=1; i<=parseInt(horizon); i++) { row += `<td>${engineCache.auc_matrix[horizon][i][sig]}</td>`; }
+                    row += "</tr>"; body.innerHTML += row;
+                }
+            });
+        }
+
+        function loadAccountPlanView(id) {
+            const acct = engineCache.portfolio.find(a => a.account_id === id);
+            if (!acct) return;
+            const container = document.getElementById('account-meta-plate');
+            container.innerHTML = `<div class="ac-note"><h3>Dossier Profile: ${acct.account_id}</h3><p>Segment Class: ${acct.segment} | Progressed to Quarter ${acct.current_quarter} of operational cycle.</p></div>`;
+            const body = document.getElementById('plan-table-body'); body.innerHTML = "";
+            if(!acct.drivers || acct.drivers.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" style="color:#1E8E5A; text-align:center; font-weight:bold;">✔ Account is tracking cleanly within optimal target tolerances.</td></tr>`;
+                return;
+            }
+            acct.drivers.forEach(d => {
+                body.innerHTML += `<tr>
+                    <td><b style="color:${d.status === "At risk" ? "#C0392B" : "#C77D0A"}">${d.status}</b></td>
+                    <td>${d.metric}</td>
+                    <td><mark style="padding:2px 6px; border-radius:4px;">${d.owner}</mark></td>
+                    <td>${d.metric} Optimizer Step</td>
+                    <td>${d.detail}</td>
+                </tr>`;
+            });
+        }
+
+        function buildSignalLibraryUI() {
+            const target = document.getElementById('library-listing'); target.innerHTML = "";
+            Object.keys(SIGNAL_METADATA).forEach(k => { target.innerHTML += `<p style='border-bottom:1px solid #DDE4EA; padding:8px 0;'><b>● ${SIGNAL_METADATA[k]}</b>: Learned prediction metric evaluating tracking system arrays.</p>`; });
+        }
+
+        function navigateToAccountPlaybook(id) { document.getElementById('account-picker').value = id; loadAccountPlanView(id); routeToPage('AccountPlan'); }
+        function applyCellFilter(band, soon) { currentActiveFilter = { band, soon }; renderPortfolioGrid(); }
+        function clearCellFilter() { currentActiveFilter = null; renderPortfolioGrid(); }
+
+        window.onload = recomputeEnginePipeline;
+    </script>
 </body>
 </html>
