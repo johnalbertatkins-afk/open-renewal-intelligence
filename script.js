@@ -30,7 +30,7 @@ async function recomputeEnginePipeline() {
     };
 
     try {
-        const response = await fetch(`${BACKEND_SERVICE_URL}/api/engine-pipeline`, {
+        const response = await fetch(`${https://open-renewal-intelligence.onrender.com}/api/engine-pipeline`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
