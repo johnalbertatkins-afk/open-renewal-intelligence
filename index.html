@@ -163,7 +163,9 @@
         function navigateToAccountPlaybook(id) { document.getElementById('account-picker').value = id; loadAccountPlanView(id); routeToPage('AccountPlan'); }
         function applyCellFilter(band, soon) { currentActiveFilter = { band, soon }; renderPortfolioGrid(); }
         function clearCellFilter() { currentActiveFilter = null; renderPortfolioGrid(); }
-        window.onload = recomputeEnginePipeline;
+        window.onload = function() {
+    routeToPage('Home');
+};
     </script>
 </body>
 </html>
