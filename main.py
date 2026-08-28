@@ -1,10 +1,14 @@
+# =============================================================================
+# Atkins Consulting - Renewal Intelligence Core Engine API (Part 1)
+# =============================================================================
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 
-app = FastAPI(title="Atkins Consulting - Renewal Intelligence API Engine")
+app = FastAPI(title="Atkins Consulting - Renewal Intelligence Core Engine API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,26 +18,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- ENGINE CONFIGURATION DATA TOKENS (Part A) ---
+FEATURES = [f"feature_{i+1}" for i in range(8)]
 TERM_CHOICES = [4, 8, 12]
 SEGMENTS = ["SMB", "Mid", "Enterprise"]
 SEGMENT_COMMIT = {"SMB": 50000, "Mid": 200000, "Enterprise": 800000}
 WINNER_OUTCOMES = {"expansion", "full_renewal"}
-LOSER_OUTCOMES  = {"under_90", "churn"}
+LOSER_OUTCOMES = {"under_90", "churn"}
 
 YELLOW_SEV = 0.25    
-RED_SEV    = 1.00    
-TARGET_AT_RISK    = 0.08   
-TARGET_ATTENTION  = 0.12   
-BAND_GAP_FLOOR    = 8.0
+RED_SEV = 1.00    
+TARGET_AT_RISK = 0.08   
+TARGET_ATTENTION = 0.12   
+BAND_GAP_FLOOR = 8.0
 
-QUARTER_SIGNALS = [
-    "consumption_vs_commit", "consumption_concentration", "integrations_live",
-    "active_users", "unique_logins", "logins", "activated_workflows",
-    "workflow_breadth", "features_used", "grounding_fail_rate",
-    "support_tickets", "escalations", "outcomes_produced", "cost_per_outcome",
-    "champion_present", "exec_touch_recency"
-]
-ACCOUNT_SIGNALS = ["time_to_deploy", "time_to_value", "eval_score", "exec_sponsor_nps"]
+SIGNALS = {
+    "consumption_vs_commit":     ("quarter", +1),
+    "consumption_concentration": ("quarter", -1),
+    "integrations_live":         ("quarter", +1),
+    "active_users":              ("quarter", +1),
+    "unique_logins":             ("quarter", +1),
+    "logins":                    ("quarter", +1),
+    "activated_workflows":       ("quarter", +1),
+    "workflow_breadth":          ("quarter", +1),
+    "features_used":             ("quarter", +1),
+    "time_to_deploy":            ("account", -1),
+    "time_to_value":             ("account", -1),
+    "grounding_fail_rate":       ("quarter", -1),
+    "support_tickets":           ("quarter", -1),
+    "escalations":               ("quarter", -1),
+    "eval_score":                ("account", +1),
+    "outcomes_produced":         ("quarter", +1),
+    "cost_per_outcome":          ("quarter", -1),
+    "exec_sponsor_nps":          ("account", +1),
+    "champion_present":          ("quarter", +1),
+    "exec_touch_recency":        ("quarter", -1)
+}
+
+QUARTER_SIGNALS = [k for k in SIGNALS if SIGNALS[k][0] == "quarter"]
+ACCOUNT_SIGNALS = [k for k in SIGNALS if SIGNALS[k][0] == "account"]
 
 class PipelineSettings(BaseModel):
     n_accounts: int = 800
@@ -46,7 +69,7 @@ class PipelineSettings(BaseModel):
     mid: float = 0.35
     seed: int = 42
 
-def make_trajectory(shape, term, rng):
+def make_trajectory(shape, term, rng, faller_end_level=0.65):
     rows = []
     for q in range(1, term + 1):
         frac = q / term
@@ -65,8 +88,8 @@ def make_trajectory(shape, term, rng):
             grounding = float(np.clip(0.05 + rng.normal(0, 0.02), 0, 1))
         else:
             start = 0.50
-            peak = 0.85
-            cons = start + (peak - start) * (frac / 0.45) if frac <= 0.45 else peak + (0.65 - peak) * ((frac - 0.45) / 0.55)
+            peak = max(faller_end_level + 0.10, 0.85)
+            cons = start + (peak - start) * (frac / 0.45) if frac <= 0.45 else peak + (faller_end_level - peak) * ((frac - 0.45) / 0.55)
             cons += rng.normal(0, 0.04)
             concentration = np.clip(0.58 + 0.15 * frac + rng.normal(0, 0.07), 0, 1)
             features = min(8, int(round(2 + 2 * frac + rng.normal(0, 0.6))))
@@ -81,7 +104,7 @@ def make_trajectory(shape, term, rng):
             grounding = float(np.clip(0.12 + 0.15 * frac + rng.normal(0, 0.03), 0, 1))
 
         rows.append({
-            "quarter_within_term": q, "consumption_vs_commit": round(max(0.05, cons), 4),
+            "quarter_within_term": q, "consumption_vs_commit": round(cons, 4),
             "consumption_concentration": round(concentration, 4), "integrations_live": integrations,
             "active_users": active_users, "unique_logins": unique_logins, "logins": logins,
             "activated_workflows": activated, "workflow_breadth": breadth, "features_used": features,
@@ -91,7 +114,7 @@ def make_trajectory(shape, term, rng):
         })
     return rows
 
-def generate_base_dataset(settings, is_live=False, seed_offset=0):
+def generate_dataset_matrix(settings, is_live=False, seed_offset=0):
     rng = np.random.default_rng(settings.seed + seed_offset)
     acct_rows, aq_rows = [], []
     count = settings.n_live if is_live else settings.n_accounts
@@ -109,28 +132,23 @@ def generate_base_dataset(settings, is_live=False, seed_offset=0):
         committed = int(SEGMENT_COMMIT[segment] * np.exp(rng.normal(0, 0.25)))
         shape = "winner" if rng.random() < settings.winner_share else "faller"
         
-        traj = make_trajectory(shape, term, rng)
-        
-        t_deploy = float(max(3, rng.normal(35, 12) if shape=="winner" else rng.normal(70, 25)))
-        t_value  = float(t_deploy + (rng.normal(20, 8) if shape=="winner" else rng.normal(55, 20)))
-        eval_score = float(np.clip(rng.normal(0.90, 0.07) if shape=="winner" else rng.normal(0.60, 0.12), 0, 1.3))
-        exec_sponsor_nps = float(np.clip(rng.normal(45, 15) if shape=="winner" else rng.normal(10, 25), -100, 100))
-        
-        ratio = traj[-1]["consumption_vs_commit"]
-        outcome = "expansion" if ratio >= 1.15 else "full_renewal" if ratio >= 1.00 else "90_99" if ratio >= 0.90 else "under_90" if ratio >= 0.75 else "churn"
+        traj = make_trajectory(shape, term, rng, rng.uniform(0.45, 0.98))
+        end_ratio = traj[-1]["consumption_vs_commit"]
+        outcome = "expansion" if end_ratio >= 1.15 else "full_renewal" if end_ratio >= 1.00 else "90_99" if end_ratio >= 0.90 else "under_90" if end_ratio >= 0.75 else "churn"
 
         acct_rows.append({
             "account_id": aid, "segment": segment, "term_quarters": term, "committed_credits_quarter": committed,
-            "time_to_deploy": round(t_deploy, 1), "time_to_value": round(t_value, 1),
-            "eval_score": round(eval_score, 4), "exec_sponsor_nps": round(exec_sponsor_nps, 1),
+            "time_to_deploy": round(float(max(3, rng.normal(35, 12) if shape=="winner" else rng.normal(70, 25))), 1),
+            "time_to_value": round(float(max(3, rng.normal(55, 12) if shape=="winner" else rng.normal(125, 25))), 1),
+            "eval_score": round(float(np.clip(rng.normal(0.90, 0.07) if shape=="winner" else rng.normal(0.60, 0.12), 0, 1.3)), 4),
+            "exec_sponsor_nps": round(float(np.clip(rng.normal(45, 15) if shape=="winner" else rng.normal(10, 25), -100, 100)), 1),
             "outcome": outcome, "shape_internal": shape
         })
         for r in traj:
             aq_rows.append({"account_id": aid, "term_quarters": term, **r})
             
     return pd.DataFrame(acct_rows), pd.DataFrame(aq_rows)
-
-def calculate_auc(x, y):
+def compute_rank_auc(x, y):
     n1, n0 = int(y.sum()), int((y == 0).sum())
     if n1 == 0 or n0 == 0: return 0.5
     ranks = pd.Series(x).rank().to_numpy()
@@ -138,9 +156,10 @@ def calculate_auc(x, y):
 
 @app.post("/api/engine-pipeline")
 def get_pipeline_data(settings: PipelineSettings):
-    h_acct, h_aq = generate_base_dataset(settings, is_live=False, seed_offset=0)
-    l_acct, l_aq = generate_base_dataset(settings, is_live=True, seed_offset=999)
+    h_acct, h_aq = generate_dataset_matrix(settings, is_live=False, seed_offset=0)
+    l_acct, l_aq = generate_dataset_matrix(settings, is_live=True, seed_offset=999)
     
+    # Layer 1: Median Benchmark Calculations
     h_aq["is_winner"] = h_aq["account_id"].map(lambda a: h_acct.set_index("account_id")["outcome"][a] in WINNER_OUTCOMES)
     win_hist = h_aq[h_aq["is_winner"]]
     
@@ -161,6 +180,7 @@ def get_pipeline_data(settings: PipelineSettings):
     for m in ACCOUNT_SIGNALS:
         aband[m] = [float(win_accts[m].quantile(0.25)), float(win_accts[m].median()), float(win_accts[m].quantile(0.75))]
 
+    # Layer 2: Mann-Whitney Separation Power Matrices (AUC)
     auc_matrix = {}
     for term in TERM_CHOICES:
         auc_matrix[str(term)] = {}
@@ -171,8 +191,10 @@ def get_pipeline_data(settings: PipelineSettings):
             sub = df[df["quarter_within_term"] == q]
             auc_matrix[str(term)][str(q)] = {}
             for m in QUARTER_SIGNALS:
-                auc_matrix[str(term)][str(q)][m] = round(calculate_auc(sub[m], sub["label"]), 2)
+                direction = SIGNALS[m][1]
+                auc_matrix[str(term)][str(q)][m] = round(compute_rank_auc(sub[m] * direction, sub["label"]), 2)
 
+    # Layer 3: Live Account Portfolio Risk Scoring & Urgency Triage
     rng = np.random.default_rng(settings.seed + 7)
     portfolio_rows = []
     
@@ -180,29 +202,33 @@ def get_pipeline_data(settings: PipelineSettings):
         term = a["term_quarters"]
         current_q = max(1, int(round(term * rng.uniform(0.40, 0.80))))
         q_to_renewal = term - current_q
-        cur = l_aq[(l_aq["account_id"] == a["account_id"]) & (l_aq["quarter_within_term"] == current_q)].iloc[0]
+        sub_aq = l_aq[(l_aq["account_id"] == a["account_id"]) & (l_aq["quarter_within_term"] == current_q)]
+        if sub_aq.empty: continue
+        cur = sub_aq.iloc[0]
         
         drivers = []
         n_tracked = 0
         
-        for m in QUARTER_SIGNALS + ACCOUNT_SIGNALS:
-            if m in QUARTER_SIGNALS:
+        for m in SIGNALS:
+            grain, direction = SIGNALS[m]
+            if grain == "quarter":
                 q25, med, q75 = benchmarks[str(term)][str(current_q)][m]
                 raw = cur[m]
             else:
                 q25, med, q75 = aband[m]
                 raw = a[m]
                 
+            if pd.isna(raw): continue
             n_tracked += 1
             val = float(raw)
             iqr = max(q75 - q25, 1e-6)
-            sev = round(min(max(0.0, (q25 - val) / iqr), 3.0), 2)
+            sev = round(min(max(0.0, (q25 - val) / iqr if direction > 0 else (val - q75) / iqr), 3.0), 2)
             
             if sev > YELLOW_SEV:
                 drivers.append({
                     "metric": m, "severity": sev, "status": "At risk" if sev >= RED_SEV else "Needs attention",
                     "owner": "FDE" if "deploy" in m or "fail" in m else "CSM",
-                    "detail": f"{val:.2f} vs winning benchmark {med:.2f}"
+                    "detail": f"{val:.2f} vs winning range median {med:.2f} " + ("(below target)" if direction > 0 and val < med else "(above target)" if direction < 0 and val > med else "(at target)")
                 })
                 
         drivers = sorted(drivers, key=lambda d: -d["severity"])
@@ -232,5 +258,7 @@ def get_pipeline_data(settings: PipelineSettings):
     return {
         "portfolio": portfolio_rows,
         "benchmarks": benchmarks,
-        "auc_matrix": auc_matrix
+        "auc_matrix": auc_matrix,
+        "raw_accounts": l_acct.head(15).to_dict(orient="records"),
+        "raw_quarter": l_aq.head(15).to_dict(orient="records")
     }
